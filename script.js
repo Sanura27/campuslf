@@ -49,6 +49,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (claimItemSelect) {
         claimItemSelect.addEventListener('change', (e) => {
             const selectedId = e.target.value;
+            const fieldsToToggle = [
+                'claim-item-name', 'claim-category', 'claim-color', 
+                'claim-location', 'claim-date', 'claim-description'
+            ];
+            
             if (selectedId) {
                 const item = reports.find(r => r.id === selectedId);
                 if (item) {
@@ -58,15 +63,25 @@ document.addEventListener('DOMContentLoaded', () => {
                     document.getElementById('claim-location').value = item.location;
                     document.getElementById('claim-date').value = item.date;
                     document.getElementById('claim-description').value = item.description;
+                    
+                    // Set fields to readonly
+                    fieldsToToggle.forEach(id => {
+                        const el = document.getElementById(id);
+                        el.readOnly = true;
+                        if (el.tagName === 'SELECT') el.style.pointerEvents = 'none'; // Select doesn't support readonly
+                    });
                 }
             } else {
-                // Clear manual fields if switched back to manual
-                document.getElementById('claim-item-name').value = '';
-                document.getElementById('claim-category').value = '';
-                document.getElementById('claim-color').value = '';
-                document.getElementById('claim-location').value = '';
-                document.getElementById('claim-date').value = '';
-                document.getElementById('claim-description').value = '';
+                // Clear manual fields and remove readonly if switched back to manual
+                fieldsToToggle.forEach(id => {
+                    const el = document.getElementById(id);
+                    el.value = '';
+                    el.readOnly = false;
+                    if (el.tagName === 'SELECT') {
+                        el.style.pointerEvents = 'auto';
+                        el.value = '';
+                    }
+                });
             }
         });
     }
@@ -154,6 +169,16 @@ function handleClaimSubmit(e) {
 }
 
 // --- Verification Logic ---
+const STOP_WORDS = ['the', 'this', 'that', 'with', 'from', 'some', 'item', 'found', 'lost', 'near', 'beside', 'color', 'inside', 'outside', 'around'];
+
+function extractKeywords(text) {
+    if (!text) return [];
+    return text.toLowerCase()
+        .replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, "")
+        .split(/\s+/)
+        .filter(word => word.length > 2 && !STOP_WORDS.includes(word));
+}
+
 function findMatches(claim) {
     // We only match claims against FOUND items that aren't returned
     const foundItems = reports.filter(r => r.status === 'found');
@@ -185,17 +210,16 @@ function findMatches(claim) {
             score += 20;
         }
 
-        // 5. Unique Feature (20%) - Keyword matching
+        // 5. Unique Feature (20%) - Keyword matching with stop-word filtering
         const itemFeature = item.uniqueFeature.toLowerCase();
-        const claimFeature = claim.uniqueFeature.toLowerCase();
-        const keywords = claimFeature.split(' ').filter(w => w.length > 3);
-        let keywordMatches = 0;
-        keywords.forEach(word => {
-            if (itemFeature.includes(word)) keywordMatches++;
-        });
+        const claimKeywords = extractKeywords(claim.uniqueFeature);
         
-        if (keywords.length > 0) {
-            score += Math.min(20, (keywordMatches / keywords.length) * 20);
+        if (claimKeywords.length > 0) {
+            let keywordMatches = 0;
+            claimKeywords.forEach(word => {
+                if (itemFeature.includes(word)) keywordMatches++;
+            });
+            score += Math.min(20, (keywordMatches / claimKeywords.length) * 20);
         }
 
         return { ...item, score: Math.round(score) };

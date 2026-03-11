@@ -222,6 +222,13 @@
                 <div id="claim-step-1">
                     <p class="form-instructions">To verify ownership, please provide accurate details about your lost item. We will compare this against our "Found" reports.</p>
                     <form id="claim-form">
+                        <div class="form-group" style="grid-column: span 2; margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 20px;">
+                            <label for="claim-item-select">Select a Found Item (Optional)</label>
+                            <select id="claim-item-select">
+                                <option value="">-- Manual Entry --</option>
+                            </select>
+                            <p class="form-help">Select an item to auto-fill the form below.</p>
+                        </div>
                         <div class="form-grid">
                             <div class="form-group">
                                 <label for="claim-contact-name">Your Full Name *</label>

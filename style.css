@@ -366,6 +366,18 @@ input:focus, select:focus, textarea:focus {
     box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
 }
 
+.form-help {
+    font-size: 0.75rem;
+    color: var(--text-light);
+    margin-top: 0.25rem;
+}
+
+input[readonly], select[readonly], textarea[readonly] {
+    background-color: #f8fafc;
+    cursor: not-allowed;
+    border-color: #e2e8f0;
+}
+
 .submit-btn {
     width: 100%;
     padding: 1rem;

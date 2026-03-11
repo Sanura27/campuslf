@@ -22,6 +22,7 @@ const filterCategory = document.getElementById('filter-category');
 const imagePreviewContainer = document.getElementById('image-preview-container');
 const idPreview = document.getElementById('id-preview');
 const fileInput = document.getElementById('claim-id-card');
+const claimItemSelect = document.getElementById('claim-item-select');
 
 // --- Initialization ---
 document.addEventListener('DOMContentLoaded', () => {
@@ -43,6 +44,32 @@ document.addEventListener('DOMContentLoaded', () => {
     if (searchInput) searchInput.addEventListener('input', renderAllReports);
     if (filterStatus) filterStatus.addEventListener('change', renderAllReports);
     if (filterCategory) filterCategory.addEventListener('change', renderAllReports);
+
+    // Claim Item Dropdown Selection
+    if (claimItemSelect) {
+        claimItemSelect.addEventListener('change', (e) => {
+            const selectedId = e.target.value;
+            if (selectedId) {
+                const item = reports.find(r => r.id === selectedId);
+                if (item) {
+                    document.getElementById('claim-item-name').value = item.itemName;
+                    document.getElementById('claim-category').value = item.category;
+                    document.getElementById('claim-color').value = item.color || '';
+                    document.getElementById('claim-location').value = item.location;
+                    document.getElementById('claim-date').value = item.date;
+                    document.getElementById('claim-description').value = item.description;
+                }
+            } else {
+                // Clear manual fields if switched back to manual
+                document.getElementById('claim-item-name').value = '';
+                document.getElementById('claim-category').value = '';
+                document.getElementById('claim-color').value = '';
+                document.getElementById('claim-location').value = '';
+                document.getElementById('claim-date').value = '';
+                document.getElementById('claim-description').value = '';
+            }
+        });
+    }
 
     // Image Preview
     if (fileInput) {
@@ -224,6 +251,18 @@ function resetClaimForm() {
     document.getElementById('claim-result').classList.add('hide');
     claimForm.reset();
     imagePreviewContainer.classList.add('hide');
+
+    // Populate dropdown with current found items
+    if (claimItemSelect) {
+        claimItemSelect.innerHTML = '<option value="">-- Manual Entry --</option>';
+        const foundItems = reports.filter(r => r.status === 'found');
+        foundItems.forEach(item => {
+            const option = document.createElement('option');
+            option.value = item.id;
+            option.textContent = `${item.itemName} (Found at ${item.location})`;
+            claimItemSelect.appendChild(option);
+        });
+    }
 }
 
 // --- Rendering Logic ---

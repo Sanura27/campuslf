@@ -24,11 +24,25 @@ const idPreview = document.getElementById('id-preview');
 const fileInput = document.getElementById('claim-id-card');
 const claimItemSelect = document.getElementById('claim-item-select');
 
+// --- Navigation Logic ---
+function navigateToStatus(status) {
+    if (status === 'claim') {
+        switchTab('view-claims');
+    } else {
+        switchTab('search');
+        if (filterStatus) {
+            filterStatus.value = status;
+            renderAllReports();
+        }
+    }
+}
+
 // --- Initialization ---
 document.addEventListener('DOMContentLoaded', () => {
     updateStats();
     renderAllReports();
     renderRecentReports();
+    renderAllClaims();
 
     // Tab Navigation
     navBtns.forEach(btn => {
@@ -116,6 +130,7 @@ function switchTab(tabId) {
 
     // Reset forms when switching
     if (tabId === 'claim') resetClaimForm();
+    if (tabId === 'view-claims') renderAllClaims();
     
     window.scrollTo(0, 0);
 }
@@ -399,4 +414,46 @@ function updateStats() {
     document.getElementById('stat-found').textContent = foundCount;
     document.getElementById('stat-claims').textContent = claimsCount;
     document.getElementById('stat-returned').textContent = returnedCount;
+}
+
+function renderAllClaims() {
+    const container = document.getElementById('claims-list');
+    if (!container) return;
+
+    container.innerHTML = '';
+    
+    if (claims.length === 0) {
+        container.innerHTML = '<p class="text-light">No claims submitted yet.</p>';
+        return;
+    }
+
+    claims.forEach(claim => {
+        const card = document.createElement('div');
+        card.className = 'item-card';
+        card.innerHTML = `
+            <div class="card-header">
+                <span class="badge status-badge claim-pending">Claim Filed</span>
+                <span class="badge category-badge">${claim.category}</span>
+            </div>
+            <h4 class="item-title">${claim.itemName}</h4>
+            <div class="item-details">
+                <div class="detail"><span class="label">By:</span> <span>${claim.contactName}</span></div>
+                <div class="detail"><span class="label">Date Lost:</span> <span>${claim.date}</span></div>
+                <div class="detail"><span class="label">Location:</span> <span>${claim.location}</span></div>
+            </div>
+            <p class="item-desc">${claim.description}</p>
+            <div class="card-footer">
+                <button class="card-btn delete-btn" onclick="deleteClaim('${claim.id}')">Delete Claim</button>
+            </div>
+        `;
+        container.appendChild(card);
+    });
+}
+
+function deleteClaim(id) {
+    if (confirm('Are you sure you want to delete this claim?')) {
+        claims = claims.filter(c => c.id !== id);
+        saveToLocalStorage();
+        renderAllClaims();
+    }
 }

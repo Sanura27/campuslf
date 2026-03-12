@@ -16,19 +16,19 @@
                 <h1>Campus <span>L&F</span></h1>
             </div>
             <div class="stats-overview">
-                <div class="stat-item">
+                <div class="stat-item" onclick="navigateToStatus('lost')" style="cursor: pointer;">
                     <span class="stat-label">Lost</span>
                     <span id="stat-lost" class="stat-value">0</span>
                 </div>
-                <div class="stat-item">
+                <div class="stat-item" onclick="navigateToStatus('found')" style="cursor: pointer;">
                     <span class="stat-label">Found</span>
                     <span id="stat-found" class="stat-value">0</span>
                 </div>
-                <div class="stat-item">
+                <div class="stat-item" onclick="navigateToStatus('claim')" style="cursor: pointer;">
                     <span class="stat-label">Claims</span>
                     <span id="stat-claims" class="stat-value">0</span>
                 </div>
-                <div class="stat-item">
+                <div class="stat-item" onclick="navigateToStatus('returned')" style="cursor: pointer;">
                     <span class="stat-label">Returned</span>
                     <span id="stat-returned" class="stat-value">0</span>
                 </div>
@@ -43,6 +43,7 @@
             <button class="nav-btn" data-tab="report-lost">Report Lost</button>
             <button class="nav-btn" data-tab="report-found">Report Found</button>
             <button class="nav-btn" data-tab="claim">Claim Item</button>
+            <button class="nav-btn" data-tab="view-claims">View Claims</button>
         </div>
     </nav>
 
@@ -53,8 +54,8 @@
                 <h2>Welcome to Campus Lost & Found</h2>
                 <p>Easily report lost items, browse found items, or file a claim to get your belongings back.</p>
                 <div class="quick-actions">
-                    <button class="action-btn" onclick="switchTab('report-lost')">Lost Something?</button>
-                    <button class="action-btn outline" onclick="switchTab('report-found')">Found Something?</button>
+                    <button class="action-btn btn-lost" onclick="switchTab('report-lost')">Lost Something?</button>
+                    <button class="action-btn btn-found" onclick="switchTab('report-found')">Found Something?</button>
                 </div>
             </div>
 
@@ -310,6 +311,17 @@
                         <button onclick="resetClaimForm()" class="action-btn">New Claim</button>
                     </div>
                 </div>
+            </div>
+        </section>
+
+        <!-- View Claims Section -->
+        <section id="view-claims" class="tab-content">
+            <div class="section-header">
+                <h3>Submitted Claims</h3>
+                <p>Track the status of ownership verification for found items.</p>
+            </div>
+            <div id="claims-list" class="reports-grid">
+                <!-- Cards will be injected by JS -->
             </div>
         </section>
     </main>
